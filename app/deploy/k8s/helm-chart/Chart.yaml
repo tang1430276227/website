@@ -1,0 +1,15 @@
+apiVersion: v2
+name: llm-gateway
+description: LLM Gateway Platform - Multi-tenant AI Model Forwarding Platform
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - llm
+  - ai
+  - gateway
+  - multi-model
+  - agent
+  - mcp
+maintainers:
+  - name: LLM Gateway Team

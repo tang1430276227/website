@@ -1,0 +1,40 @@
+{
+    "title": "api_keys",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "user_id": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "key_prefix": {
+            "type": "string",
+            "description": "First 8 chars for display"
+        },
+        "key_hash": {
+            "type": "string",
+            "description": "Hashed full key"
+        },
+        "is_active": {
+            "type": "boolean",
+            "default": true
+        },
+        "last_used_at": {
+            "type": "string",
+            "description": "ISO timestamp of last use"
+        },
+        "usage_count": {
+            "type": "integer",
+            "default": 0
+        }
+    },
+    "required": [
+        "name",
+        "key_hash",
+        "user_id"
+    ]
+}

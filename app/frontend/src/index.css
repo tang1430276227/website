@@ -1,0 +1,149 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 47% 6%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 8%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 8%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 6%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 217 91% 60%;
+    --radius: 0.75rem;
+    --sidebar-background: 222 47% 7%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 222 47% 6%;
+    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 33% 17%;
+    --sidebar-ring: 217 91% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(222 47% 8%);
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(217 33% 25%);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(217 33% 35%);
+}
+
+/* Markdown content styles */
+.markdown-content h1 { @apply text-2xl font-bold mb-4; }
+.markdown-content h2 { @apply text-xl font-semibold mb-3; }
+.markdown-content h3 { @apply text-lg font-medium mb-2; }
+.markdown-content p { @apply mb-3 leading-relaxed; }
+.markdown-content ul { @apply list-disc pl-6 mb-3; }
+.markdown-content ol { @apply list-decimal pl-6 mb-3; }
+.markdown-content li { @apply mb-1; }
+.markdown-content code { @apply bg-secondary px-1.5 py-0.5 rounded text-sm font-mono; }
+.markdown-content pre { @apply bg-secondary p-4 rounded-lg overflow-x-auto mb-4; }
+.markdown-content pre code { @apply bg-transparent p-0; }
+.markdown-content blockquote { @apply border-l-4 border-primary pl-4 italic my-4; }
+
+/* Card slide-in animation (right to left) */
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slideInFromRight 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+/* Slow clover rotation */
+@keyframes cloverSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes petalBloom {
+  0% { transform: scale(0.5); opacity: 0; border-radius: 50%; }
+  60% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-petal-bloom {
+  animation: petalBloom 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+}
+
+/* Slide in from top animation */
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-cursor-blink {
+  animation: cursorBlink 0.7s step-end infinite;
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in-top {
+  animation: slideInFromTop 0.4s ease-out forwards;
+  opacity: 0;
+}
+
+/* React Flow custom styles */
+.react-flow__node {
+  border-radius: 8px;
+}
+.react-flow__edge-path {
+  stroke: hsl(217 91% 60%);
+  stroke-width: 2;
+}

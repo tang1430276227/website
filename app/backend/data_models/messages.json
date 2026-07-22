@@ -1,0 +1,36 @@
+{
+    "title": "messages",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "user_id": {
+            "type": "string"
+        },
+        "conversation_id": {
+            "type": "integer"
+        },
+        "role": {
+            "type": "string",
+            "description": "system, user, assistant"
+        },
+        "content": {
+            "type": "string"
+        },
+        "model": {
+            "type": "string",
+            "description": "Model used for this message"
+        },
+        "tokens_used": {
+            "type": "integer",
+            "default": 0
+        }
+    },
+    "required": [
+        "conversation_id",
+        "role",
+        "content",
+        "user_id"
+    ]
+}

@@ -1,0 +1,38 @@
+{
+    "title": "agent_executions",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "user_id": {
+            "type": "string"
+        },
+        "agent_id": {
+            "type": "integer"
+        },
+        "input_text": {
+            "type": "string"
+        },
+        "output_text": {
+            "type": "string"
+        },
+        "status": {
+            "type": "string",
+            "default": "pending"
+        },
+        "error_message": {
+            "type": "string"
+        },
+        "execution_time_ms": {
+            "type": "integer",
+            "default": 0
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "agent_id",
+        "input_text"
+    ]
+}

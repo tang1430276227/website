@@ -1,0 +1,20 @@
+{
+    "title": "tenant_members",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "tenant_id": {
+            "type": "integer"
+        },
+        "role": {
+            "type": "string",
+            "default": "member"
+        }
+    },
+    "required": [
+        "id",
+        "tenant_id"
+    ]
+}

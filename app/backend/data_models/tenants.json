@@ -1,0 +1,36 @@
+{
+    "title": "tenants",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "name": {
+            "type": "string"
+        },
+        "slug": {
+            "type": "string"
+        },
+        "owner_user_id": {
+            "type": "string"
+        },
+        "plan": {
+            "type": "string",
+            "default": "free"
+        },
+        "max_tokens_per_month": {
+            "type": "integer",
+            "default": 1000000
+        },
+        "is_active": {
+            "type": "boolean",
+            "default": true
+        }
+    },
+    "required": [
+        "id",
+        "name",
+        "slug",
+        "owner_user_id"
+    ]
+}

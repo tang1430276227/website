@@ -1,0 +1,102 @@
+[
+    {
+        "name": "网页搜索",
+        "description": "实时网页搜索引擎，获取最新信息和数据",
+        "server_url": "https://mcp-search.example.com/sse",
+        "auth_type": "api_key",
+        "auth_config": "{}",
+        "tools_schema": "[{\"name\":\"web_search\",\"description\":\"搜索网页内容\"},{\"name\":\"news_search\",\"description\":\"搜索新闻\"}]",
+        "is_active": true,
+        "user_id": "1442057"
+    },
+    {
+        "name": "文件管理",
+        "description": "文件读写和格式转换工具，支持多种文件格式处理",
+        "server_url": "https://mcp-files.example.com/sse",
+        "auth_type": "bearer",
+        "auth_config": "{}",
+        "tools_schema": "[{\"name\":\"read_file\",\"description\":\"读取文件\"},{\"name\":\"write_file\",\"description\":\"写入文件\"},{\"name\":\"convert_format\",\"description\":\"格式转换\"}]",
+        "is_active": true,
+        "user_id": "1442057"
+    },
+    {
+        "name": "数据库查询",
+        "description": "SQL数据库查询工具，支持多种数据库连接和查询操作",
+        "server_url": "https://mcp-db.example.com/sse",
+        "auth_type": "bearer",
+        "auth_config": "{}",
+        "tools_schema": "[{\"name\":\"execute_sql\",\"description\":\"执行SQL查询\"},{\"name\":\"list_tables\",\"description\":\"列出数据表\"}]",
+        "is_active": true,
+        "user_id": "1442057"
+    },
+    {
+        "name": "API调试",
+        "description": "HTTP API调试和测试工具，支持各种请求方法和认证方式",
+        "server_url": "https://mcp-api.example.com/sse",
+        "auth_type": "none",
+        "auth_config": "{}",
+        "tools_schema": "[{\"name\":\"send_request\",\"description\":\"发送HTTP请求\"},{\"name\":\"mock_server\",\"description\":\"模拟API服务\"}]",
+        "is_active": true,
+        "user_id": "1442057"
+    },
+    {
+        "name": "代码执行",
+        "description": "安全沙箱代码执行环境，支持Python/JS/Shell脚本运行",
+        "server_url": "https://mcp-code.example.com/sse",
+        "auth_type": "bearer",
+        "auth_config": "{}",
+        "tools_schema": "[{\"name\":\"run_python\",\"description\":\"执行Python代码\"},{\"name\":\"run_javascript\",\"description\":\"执行JS代码\"},{\"name\":\"run_shell\",\"description\":\"执行Shell命令\"}]",
+        "is_active": true,
+        "user_id": "1442057"
+    },
+    {
+        "name": "邮件发送",
+        "description": "邮件发送和管理工具，支持模板邮件和批量发送",
+        "server_url": "https://mcp-email.example.com/sse",
+        "auth_type": "oauth",
+        "auth_config": "{}",
+        "tools_schema": "[{\"name\":\"send_email\",\"description\":\"发送邮件\"},{\"name\":\"list_templates\",\"description\":\"邮件模板列表\"}]",
+        "is_active": true,
+        "user_id": "1442057"
+    },
+    {
+        "name": "日程管理",
+        "description": "日程安排和提醒工具，支持日历同步和会议管理",
+        "server_url": "https://mcp-calendar.example.com/sse",
+        "auth_type": "oauth",
+        "auth_config": "{}",
+        "tools_schema": "[{\"name\":\"create_event\",\"description\":\"创建日程\"},{\"name\":\"list_events\",\"description\":\"查看日程\"},{\"name\":\"set_reminder\",\"description\":\"设置提醒\"}]",
+        "is_active": true,
+        "user_id": "1442057"
+    },
+    {
+        "name": "知识库检索",
+        "description": "企业知识库向量检索工具，支持语义搜索和文档问答",
+        "server_url": "https://mcp-kb.example.com/sse",
+        "auth_type": "api_key",
+        "auth_config": "{}",
+        "tools_schema": "[{\"name\":\"search_docs\",\"description\":\"搜索文档\"},{\"name\":\"ask_question\",\"description\":\"知识问答\"}]",
+        "is_active": true,
+        "user_id": "1442057"
+    },
+    {
+        "name": "图表生成",
+        "description": "数据可视化图表生成工具，支持柱状图、折线图、饼图等",
+        "server_url": "https://mcp-chart.example.com/sse",
+        "auth_type": "none",
+        "auth_config": "{}",
+        "tools_schema": "[{\"name\":\"create_chart\",\"description\":\"创建图表\"},{\"name\":\"export_image\",\"description\":\"导出图片\"}]",
+        "is_active": true,
+        "user_id": "1442057"
+    },
+    {
+        "name": "自动化脚本",
+        "description": "自动化任务编排工具，支持定时任务和工作流触发",
+        "server_url": "https://mcp-auto.example.com/sse",
+        "auth_type": "bearer",
+        "auth_config": "{}",
+        "tools_schema": "[{\"name\":\"create_task\",\"description\":\"创建自动化任务\"},{\"name\":\"run_workflow\",\"description\":\"运行工作流\"},{\"name\":\"schedule_job\",\"description\":\"定时任务\"}]",
+        "is_active": true,
+        "user_id": "1442057"
+    }
+]

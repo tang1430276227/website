@@ -1,0 +1,39 @@
+{
+    "title": "workflows",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "user_id": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "description": {
+            "type": "string"
+        },
+        "nodes": {
+            "type": "string",
+            "description": "JSON array of workflow nodes"
+        },
+        "edges": {
+            "type": "string",
+            "description": "JSON array of workflow edges"
+        },
+        "config": {
+            "type": "string",
+            "description": "JSON workflow configuration"
+        },
+        "status": {
+            "type": "string",
+            "default": "draft",
+            "description": "draft, active, archived"
+        }
+    },
+    "required": [
+        "name",
+        "user_id"
+    ]
+}

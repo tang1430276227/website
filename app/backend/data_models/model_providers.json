@@ -1,0 +1,42 @@
+{
+    "title": "model_providers",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "name": {
+            "type": "string",
+            "description": "Provider name like OpenAI, Anthropic"
+        },
+        "api_type": {
+            "type": "string",
+            "description": "openai, anthropic, google, deepseek, zhipu, qwen, custom"
+        },
+        "base_url": {
+            "type": "string",
+            "description": "API base URL"
+        },
+        "api_key_encrypted": {
+            "type": "string",
+            "description": "Encrypted API key"
+        },
+        "models": {
+            "type": "string",
+            "description": "JSON array of available model names"
+        },
+        "is_active": {
+            "type": "boolean",
+            "default": true
+        },
+        "config": {
+            "type": "string",
+            "description": "JSON config for provider-specific settings"
+        }
+    },
+    "required": [
+        "name",
+        "api_type",
+        "base_url"
+    ]
+}

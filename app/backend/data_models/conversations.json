@@ -1,0 +1,31 @@
+{
+    "title": "conversations",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "user_id": {
+            "type": "string"
+        },
+        "title": {
+            "type": "string"
+        },
+        "model": {
+            "type": "string",
+            "description": "Current model being used"
+        },
+        "agent_id": {
+            "type": "integer",
+            "description": "Optional agent ID if using an agent"
+        },
+        "is_archived": {
+            "type": "boolean",
+            "default": false
+        }
+    },
+    "required": [
+        "title",
+        "user_id"
+    ]
+}

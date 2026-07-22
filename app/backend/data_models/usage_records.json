@@ -1,0 +1,41 @@
+{
+    "title": "usage_records",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "tenant_id": {
+            "type": "integer"
+        },
+        "conversation_id": {
+            "type": "integer"
+        },
+        "model": {
+            "type": "string"
+        },
+        "provider": {
+            "type": "string"
+        },
+        "prompt_tokens": {
+            "type": "integer",
+            "default": 0
+        },
+        "completion_tokens": {
+            "type": "integer",
+            "default": 0
+        },
+        "total_tokens": {
+            "type": "integer",
+            "default": 0
+        },
+        "cost_credits": {
+            "type": "number",
+            "default": 0
+        }
+    },
+    "required": [
+        "id",
+        "model"
+    ]
+}

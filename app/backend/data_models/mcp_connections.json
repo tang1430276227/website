@@ -1,0 +1,30 @@
+{
+    "title": "mcp_connections",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "user_id": {
+            "type": "string"
+        },
+        "mcp_tool_id": {
+            "type": "integer"
+        },
+        "status": {
+            "type": "string",
+            "default": "disconnected"
+        },
+        "last_ping_at": {
+            "type": "string"
+        },
+        "error_message": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "mcp_tool_id"
+    ]
+}

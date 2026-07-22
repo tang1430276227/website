@@ -1,0 +1,10 @@
+[
+    {
+        "name": "小红书推文生成",
+        "description": "完整的小红书推文生成工作流：输入关键词 → 搜索参考文案 → 图片描述分析 → AI生成小红书风格文案 → 发送发布",
+        "nodes": "[{\"id\":\"node-input\",\"type\":\"custom\",\"position\":{\"x\":300,\"y\":30},\"data\":{\"label\":\"关键词输入\",\"nodeType\":\"input\",\"status\":\"idle\"}},{\"id\":\"node-img-input\",\"type\":\"custom\",\"position\":{\"x\":550,\"y\":30},\"data\":{\"label\":\"图片输入（可选）\",\"nodeType\":\"input\",\"status\":\"idle\"}},{\"id\":\"node-web-search\",\"type\":\"custom\",\"position\":{\"x\":200,\"y\":200},\"data\":{\"label\":\"搜索小红书文案\",\"nodeType\":\"tool\",\"toolName\":\"网页搜索\",\"status\":\"idle\"}},{\"id\":\"node-img-desc\",\"type\":\"custom\",\"position\":{\"x\":550,\"y\":200},\"data\":{\"label\":\"图片描述分析\",\"nodeType\":\"agent\",\"agentName\":\"创意策划\",\"status\":\"idle\"}},{\"id\":\"node-copywrite\",\"type\":\"custom\",\"position\":{\"x\":380,\"y\":380},\"data\":{\"label\":\"生成小红书文案\",\"nodeType\":\"agent\",\"agentName\":\"写作助手\",\"status\":\"idle\"}},{\"id\":\"node-send\",\"type\":\"custom\",\"position\":{\"x\":380,\"y\":550},\"data\":{\"label\":\"发送文案\",\"nodeType\":\"tool\",\"toolName\":\"邮件发送\",\"status\":\"idle\"}}]",
+        "edges": "[{\"id\":\"e-input-search\",\"source\":\"node-input\",\"target\":\"node-web-search\",\"animated\":True,\"style\":{\"stroke\":\"hsl(217 91% 60%)\"}},{\"id\":\"e-img-desc\",\"source\":\"node-img-input\",\"target\":\"node-img-desc\",\"animated\":True,\"style\":{\"stroke\":\"hsl(270 91% 60%)\"}},{\"id\":\"e-search-copy\",\"source\":\"node-web-search\",\"target\":\"node-copywrite\",\"animated\":True,\"style\":{\"stroke\":\"hsl(217 91% 60%)\"}},{\"id\":\"e-desc-copy\",\"source\":\"node-img-desc\",\"target\":\"node-copywrite\",\"animated\":True,\"style\":{\"stroke\":\"hsl(270 91% 60%)\"}},{\"id\":\"e-copy-send\",\"source\":\"node-copywrite\",\"target\":\"node-send\",\"animated\":True,\"style\":{\"stroke\":\"hsl(160 91% 40%)\"}}]",
+        "status": "active",
+        "user_id": "1442057"
+    }
+]

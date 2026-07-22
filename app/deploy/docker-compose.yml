@@ -1,0 +1,274 @@
+# LLM Gateway Platform - Docker Compose 集群部署配置
+# 支持水平扩展至百万级用户
+
+version: '3.9'
+
+services:
+  # ==================== 基础设施层 ====================
+  
+  # PostgreSQL 主数据库
+  postgres:
+    image: postgres:16-alpine
+    container_name: llm-gateway-postgres
+    environment:
+      POSTGRES_DB: llm_gateway
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+      POSTGRES_MAX_CONNECTIONS: 200
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2'
+    networks:
+      - llm-network
+
+  # Redis 集群 (缓存/会话/限流/Pub-Sub)
+  redis:
+    image: redis:7-alpine
+    container_name: llm-gateway-redis
+    command: >
+      redis-server
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --appendonly yes
+      --requirepass ${REDIS_PASSWORD:-changeme}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-changeme}", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1'
+    networks:
+      - llm-network
+
+  # RabbitMQ 消息队列 (异步任务/Agent执行队列)
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: llm-gateway-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${MQ_USER:-admin}
+      RABBITMQ_DEFAULT_PASS: ${MQ_PASSWORD:-changeme}
+      RABBITMQ_DEFAULT_VHOST: llm_gateway
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    ports:
+      - "5672:5672"   # AMQP
+      - "15672:15672" # Management UI
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1'
+    networks:
+      - llm-network
+
+  # ==================== 网关层 ====================
+  
+  # API Gateway (Nginx + Rate Limiting)
+  gateway:
+    image: nginx:alpine
+    container_name: llm-gateway-nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - auth-service
+      - chat-service
+      - agent-service
+      - admin-service
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
+    networks:
+      - llm-network
+
+  # ==================== 服务层 ====================
+
+  # Auth Service (认证授权服务)
+  auth-service:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: llm-gateway-auth
+    environment:
+      SERVICE_NAME: auth
+      DATABASE_URL: postgresql+asyncpg://${DB_USER:-postgres}:${DB_PASSWORD:-changeme}@postgres:5432/llm_gateway
+      REDIS_URL: redis://:${REDIS_PASSWORD:-changeme}@redis:6379/0
+      JWT_SECRET: ${JWT_SECRET:-your-jwt-secret}
+      OAUTH_GOOGLE_CLIENT_ID: ${OAUTH_GOOGLE_CLIENT_ID}
+      OAUTH_GOOGLE_CLIENT_SECRET: ${OAUTH_GOOGLE_CLIENT_SECRET}
+      OAUTH_GITHUB_CLIENT_ID: ${OAUTH_GITHUB_CLIENT_ID}
+      OAUTH_GITHUB_CLIENT_SECRET: ${OAUTH_GITHUB_CLIENT_SECRET}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1'
+    networks:
+      - llm-network
+
+  # Chat Service (对话转发+流式代理)
+  chat-service:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: llm-gateway-chat
+    environment:
+      SERVICE_NAME: chat
+      DATABASE_URL: postgresql+asyncpg://${DB_USER:-postgres}:${DB_PASSWORD:-changeme}@postgres:5432/llm_gateway
+      REDIS_URL: redis://:${REDIS_PASSWORD:-changeme}@redis:6379/1
+      RABBITMQ_URL: amqp://${MQ_USER:-admin}:${MQ_PASSWORD:-changeme}@rabbitmq:5672/llm_gateway
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    deploy:
+      replicas: 5
+      resources:
+        limits:
+          memory: 1G
+          cpus: '2'
+    networks:
+      - llm-network
+
+  # Agent Service (Agent执行引擎+工作流调度)
+  agent-service:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: llm-gateway-agent
+    environment:
+      SERVICE_NAME: agent
+      DATABASE_URL: postgresql+asyncpg://${DB_USER:-postgres}:${DB_PASSWORD:-changeme}@postgres:5432/llm_gateway
+      REDIS_URL: redis://:${REDIS_PASSWORD:-changeme}@redis:6379/2
+      RABBITMQ_URL: amqp://${MQ_USER:-admin}:${MQ_PASSWORD:-changeme}@rabbitmq:5672/llm_gateway
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2'
+    networks:
+      - llm-network
+
+  # MCP Service (MCP工具代理)
+  mcp-service:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: llm-gateway-mcp
+    environment:
+      SERVICE_NAME: mcp
+      DATABASE_URL: postgresql+asyncpg://${DB_USER:-postgres}:${DB_PASSWORD:-changeme}@postgres:5432/llm_gateway
+      REDIS_URL: redis://:${REDIS_PASSWORD:-changeme}@redis:6379/3
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1'
+    networks:
+      - llm-network
+
+  # Admin Service (管理后台API)
+  admin-service:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: llm-gateway-admin
+    environment:
+      SERVICE_NAME: admin
+      DATABASE_URL: postgresql+asyncpg://${DB_USER:-postgres}:${DB_PASSWORD:-changeme}@postgres:5432/llm_gateway
+      REDIS_URL: redis://:${REDIS_PASSWORD:-changeme}@redis:6379/4
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1'
+    networks:
+      - llm-network
+
+  # ==================== 前端层 ====================
+
+  # Frontend (React SPA)
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: llm-gateway-frontend
+    ports:
+      - "3000:80"
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.25'
+    networks:
+      - llm-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  rabbitmq_data:
+
+networks:
+  llm-network:
+    driver: bridge

@@ -1,0 +1,46 @@
+{
+    "title": "agents",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "user_id": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "description": {
+            "type": "string"
+        },
+        "system_prompt": {
+            "type": "string"
+        },
+        "code": {
+            "type": "string",
+            "description": "Agent source code"
+        },
+        "model": {
+            "type": "string",
+            "description": "Default model for this agent"
+        },
+        "config": {
+            "type": "string",
+            "description": "JSON config for agent parameters"
+        },
+        "is_public": {
+            "type": "boolean",
+            "default": false
+        },
+        "status": {
+            "type": "string",
+            "default": "draft",
+            "description": "draft, active, archived"
+        }
+    },
+    "required": [
+        "name",
+        "user_id"
+    ]
+}

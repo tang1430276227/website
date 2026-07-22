@@ -1,0 +1,42 @@
+{
+    "title": "mcp_tools",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "user_id": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "description": {
+            "type": "string"
+        },
+        "server_url": {
+            "type": "string"
+        },
+        "auth_type": {
+            "type": "string",
+            "description": "none, bearer, api_key, oauth"
+        },
+        "auth_config": {
+            "type": "string",
+            "description": "JSON auth configuration"
+        },
+        "tools_schema": {
+            "type": "string",
+            "description": "JSON schema of available tools"
+        },
+        "is_active": {
+            "type": "boolean",
+            "default": true
+        }
+    },
+    "required": [
+        "name",
+        "server_url",
+        "user_id"
+    ]
+}

@@ -1,0 +1,251 @@
+# LLM Gateway Platform - Helm Chart Values
+# 集群化部署配置，支持百万级扩展
+
+global:
+  namespace: llm-gateway
+  environment: production
+  domain: llm-gateway.example.com
+
+# ==================== 基础设施 ====================
+
+postgresql:
+  enabled: true
+  image: postgres:16-alpine
+  replicas: 1  # 生产环境建议使用 PostgreSQL HA (Patroni)
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "1000m"
+    limits:
+      memory: "4Gi"
+      cpu: "4000m"
+  storage:
+    size: 100Gi
+    storageClass: gp3
+  config:
+    maxConnections: 500
+    sharedBuffers: "1GB"
+    workMem: "16MB"
+
+redis:
+  enabled: true
+  image: redis:7-alpine
+  mode: cluster  # standalone | cluster | sentinel
+  replicas: 3
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+  config:
+    maxmemory: "512mb"
+    maxmemoryPolicy: "allkeys-lru"
+
+rabbitmq:
+  enabled: true
+  image: rabbitmq:3.13-management-alpine
+  replicas: 3
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "2000m"
+  config:
+    vhost: llm_gateway
+    queues:
+      - name: chat_requests
+        durable: true
+        arguments:
+          x-max-priority: 10
+      - name: agent_tasks
+        durable: true
+        arguments:
+          x-message-ttl: 300000
+      - name: mcp_calls
+        durable: true
+
+# ==================== 微服务 Pod 配置 ====================
+
+services:
+  # API Gateway (网关路由+限流)
+  gateway:
+    replicas: 3
+    autoscaling:
+      enabled: true
+      minReplicas: 3
+      maxReplicas: 20
+      targetCPUUtilization: 70
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "1000m"
+    rateLimit:
+      enabled: true
+      requestsPerSecond: 1000
+      burstSize: 2000
+
+  # Auth Service (认证授权)
+  auth:
+    replicas: 3
+    autoscaling:
+      enabled: true
+      minReplicas: 3
+      maxReplicas: 10
+      targetCPUUtilization: 75
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "1000m"
+    config:
+      sessionTTL: 86400  # 24 hours
+      tokenExpiry: 3600  # 1 hour
+      refreshTokenExpiry: 604800  # 7 days
+
+  # Chat Service (对话转发+流式代理)
+  chat:
+    replicas: 5
+    autoscaling:
+      enabled: true
+      minReplicas: 5
+      maxReplicas: 50
+      targetCPUUtilization: 60
+      targetMemoryUtilization: 70
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "2000m"
+    config:
+      maxConcurrentStreams: 100
+      streamTimeout: 120s
+      connectionPool:
+        maxSize: 200
+        minSize: 20
+
+  # Agent Service (Agent执行引擎+工作流调度)
+  agent:
+    replicas: 3
+    autoscaling:
+      enabled: true
+      minReplicas: 3
+      maxReplicas: 30
+      targetCPUUtilization: 65
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "1000m"
+      limits:
+        memory: "4Gi"
+        cpu: "4000m"
+    config:
+      workerConcurrency: 10
+      taskTimeout: 300s
+      maxRetries: 3
+
+  # MCP Service (MCP工具代理)
+  mcp:
+    replicas: 2
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 15
+      targetCPUUtilization: 70
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "1000m"
+    config:
+      toolTimeout: 30s
+      maxToolsPerRequest: 10
+
+  # Admin Service (管理后台API)
+  admin:
+    replicas: 2
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 5
+      targetCPUUtilization: 80
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "1000m"
+
+  # Frontend (React SPA - 静态资源)
+  frontend:
+    replicas: 2
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 10
+      targetCPUUtilization: 80
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "100m"
+      limits:
+        memory: "256Mi"
+        cpu: "500m"
+
+# ==================== 网络与安全 ====================
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "120"
+  tls:
+    enabled: true
+    secretName: llm-gateway-tls
+
+networkPolicies:
+  enabled: true
+  # 仅允许 gateway 访问内部服务
+  # 仅允许服务访问对应的基础设施
+
+# ==================== 监控与可观测性 ====================
+
+monitoring:
+  prometheus:
+    enabled: true
+    scrapeInterval: 15s
+  grafana:
+    enabled: true
+  alerting:
+    enabled: true
+    rules:
+      - name: high_error_rate
+        condition: "error_rate > 5%"
+        duration: 5m
+        severity: critical
+      - name: high_latency
+        condition: "p99_latency > 5s"
+        duration: 3m
+        severity: warning
+      - name: queue_backlog
+        condition: "queue_size > 10000"
+        duration: 2m
+        severity: warning
